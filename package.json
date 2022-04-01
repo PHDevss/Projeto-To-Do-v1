@@ -1,0 +1,13 @@
+{
+  "name": "projeto-to-do-v1",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
