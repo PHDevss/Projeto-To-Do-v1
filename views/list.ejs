@@ -7,6 +7,15 @@
     <title>To Do List</title>
 </head>
 <body>
-    <h1>Hoje é <%= kindOfDay %></h1>
+        <h1 style="text-transform:capitalize;"><%= kindOfDay %></h1>
+        <ul>
+            <% for(let i = 0; i < itemAdicionado.length ; i++){ %>
+                <li><%= itemAdicionado[i] %></li>
+            <% } %>
+        </ul>
+        <form action="/" method="post">
+            <input type="text" name="novoItem" id="" placeholder="Adicione um novo item...">
+            <button type="submit">Adicionar</button>
+        </form>
 </body>
 </html>
