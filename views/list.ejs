@@ -5,17 +5,27 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To Do List</title>
+
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
-        <h1 style="text-transform:capitalize;"><%= kindOfDay %></h1>
-        <ul>
-            <% for(let i = 0; i < itemAdicionado.length ; i++){ %>
-                <li><%= itemAdicionado[i] %></li>
-            <% } %>
-        </ul>
-        <form action="/" method="post">
-            <input type="text" name="novoItem" id="" placeholder="Adicione um novo item...">
-            <button type="submit">Adicionar</button>
-        </form>
+        <div class="box" id="heading">
+            <h1 style="text-transform:capitalize;"><%= kindOfDay %></h1>
+        </div>
+
+        <div class="box">
+            <ul>
+                <% for(let i = 0; i < itemAdicionado.length ; i++){ %>
+                    <div class="item">
+                        <input type="checkbox">
+                        <p><%= itemAdicionado[i] %></p>
+                    </div>
+                <% } %>
+            </ul>
+            <form action="/" method="post" class="item">
+                <input type="text" name="novoItem" id="" placeholder="Novo item..." autocomplete="off">
+                <button type="submit">+</button>
+            </form>
+        </div>
 </body>
 </html>
