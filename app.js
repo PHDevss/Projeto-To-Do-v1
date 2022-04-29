@@ -1,10 +1,9 @@
 const express = require("express");
-const res = require("express/lib/response");
 // const date = require(__dirname+'/date.js')
 const mongoose = require('mongoose')
 
 const app = express()
-const itens = []
+// let itens = []
 // const workItens = []
 
 app.set('view engine', 'ejs')
@@ -13,6 +12,11 @@ app.use(express.urlencoded({
     extended: true
 }))
 app.use(express.static('public'))
+
+app.use((req, res, next) => {
+    if (req.params.customListName == "favicon.ico") req.params.customListName = null;
+    next();
+})
 
 //BANCO DE DADOS 
 mongoose.connect('mongodb://localhost:27017/todolistDB', {useNewUrlParser: true})
@@ -23,7 +27,24 @@ const itemsSchema = {
 
 const Item = mongoose.model("Item", itemsSchema)
 
+const item1 = new Item ({
+    name: 'Welcome to your todoList!'
+})
+const item2 = new Item ({
+    name: 'Hit the + button to add a new item.'
+})
+const item3 = new Item ({
+    name: '<== Hit this to delete an item.'
+})
 
+const defaultItems = [item1, item2, item3]
+
+const listSchema = {
+    name: String,
+    items: [itemsSchema]
+}
+
+const List = mongoose.model('List', listSchema)
 
 //END BANCO DE DADOS
 
@@ -34,18 +55,6 @@ app.get('/', function (req, res) {
             console.log(err);
         }else{
             if(foundItens.length === 0){
-                const item1 = new Item ({
-                    name: 'Welcome to your todoList!'
-                })
-                const item2 = new Item ({
-                    name: 'Hit the + button to add a new item.'
-                })
-                const item3 = new Item ({
-                    name: '<== Hit this to delete an item.'
-                })
-                
-                const defaultItems = [item1, item2, item3]
-                
                 Item.insertMany(defaultItems, function(err){
                     if(err){
                         console.log(err)
@@ -53,25 +62,68 @@ app.get('/', function (req, res) {
                         console.log('Successfully saved default items to DB.');
                     }
                 })
+                res.redirect('/')
+            } else {
+                res.render('list', { listTitle: "Today", itemAdicionado: foundItens })
             }
-
-            foundItens.forEach(element => {
-                itens.push(element.name)
-            });
-            res.render('list', { listTitle: "Today", itemAdicionado: itens })
         }
     })
-
 })
 
+app.get('/:customListName', function (req, res) {
+    const customListName = req.params.customListName
+    console.log(customListName);
+    List.findOne({ name: customListName }, function(err, foundList){
+        if(!err){
+            if(!foundList){
+                const list = new List({
+                    name: customListName,
+                    items: defaultItems
+                })
+                list.save()
+                res.redirect('/' + customListName)
+            } else {
+                res.render('list', { listTitle: foundList.name, itemAdicionado: foundList.items })
+            }
+        }
+    }) 
+})
 
 app.post('/', function(req, res){
     const itemName = req.body.novoItem
+    const listName = req.body.list
     const newItem = new Item ({
         name: itemName
     })
-    newItem.save()
-    res.redirect('/')
+    console.log('entrou');
+    if(listName === 'Today'){
+        newItem.save()
+        res.redirect('/')
+    } else {
+        List.findOne({name: listName}, function(err, foundList){
+            foundList.items.push(newItem)
+            foundList.save()
+            res.redirect('/' + listName)
+        })
+    }
+})
+
+app.post('/delete', function(req, res){
+    const checkedItemId = req.body.checkbox
+    const listName = req.body.listName
+
+    if(listName === 'Today'){
+        Item.findByIdAndRemove(checkedItemId, function(err){
+            if(err){
+                console.log(err)
+            } else {
+                console.log('Successfully removed selected item from DB.');
+                res.redirect('/')
+            }
+        })
+    } else {
+
+    }
 })
 
 
