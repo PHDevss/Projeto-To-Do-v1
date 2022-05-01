@@ -1,6 +1,7 @@
 const express = require("express");
 // const date = require(__dirname+'/date.js')
 const mongoose = require('mongoose')
+const _ = require('lodash')
 
 const app = express()
 // let itens = []
@@ -71,8 +72,7 @@ app.get('/', function (req, res) {
 })
 
 app.get('/:customListName', function (req, res) {
-    const customListName = req.params.customListName
-    console.log(customListName);
+    const customListName = _.capitalize(req.params.customListName)
     List.findOne({ name: customListName }, function(err, foundList){
         if(!err){
             if(!foundList){
@@ -95,7 +95,6 @@ app.post('/', function(req, res){
     const newItem = new Item ({
         name: itemName
     })
-    console.log('entrou');
     if(listName === 'Today'){
         newItem.save()
         res.redirect('/')
@@ -114,15 +113,17 @@ app.post('/delete', function(req, res){
 
     if(listName === 'Today'){
         Item.findByIdAndRemove(checkedItemId, function(err){
-            if(err){
-                console.log(err)
-            } else {
+            if(!err){
                 console.log('Successfully removed selected item from DB.');
                 res.redirect('/')
-            }
+            } 
         })
     } else {
-
+        List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItemId}}}, function (err, foundList) { 
+            if(!err){
+                res.redirect('/' + listName)
+            }
+         })
     }
 })
 
