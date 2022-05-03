@@ -133,4 +133,4 @@ app.get('/about', function (req, res) {
     res.render('about')
 })
 
-listen(PORT, () => console.log(`Listening on ${ PORT }`))
+app.listen(PORT, () => console.log(`Listening on ${ PORT }`))
