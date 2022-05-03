@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 })
 
 //BANCO DE DADOS 
-mongoose.connect('mongodb://localhost:27017/todolistDB', {useNewUrlParser: true})
+mongoose.connect('mongodb+srv://admin-phfoliveira:Prozy123@cluster0.xbyn2.mongodb.net/todolistDB', {useNewUrlParser: true})
 
 const itemsSchema = {
     name: String
